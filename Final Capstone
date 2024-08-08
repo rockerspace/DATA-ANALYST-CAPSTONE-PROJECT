@@ -1,1 +1,70 @@
+api_url="http://127.0.0.1:5000/data/all"
+def get_number_of_jobs_T(technology):
+    
+    response_api = requests.get(api_url)
 
+    number_of_jobs = 0
+
+    if response_api.ok:            
+        jobs = response_api.json()
+
+    for job in jobs:
+        key = job.get('Key Skills')
+
+        if key.find(technology) > -1 :
+            number_of_jobs = number_of_jobs + 1
+
+    number_of_jobs
+    
+    return technology,number_of_jobs
+
+get_number_of_jobs_T("Python")
+
+
+def get_number_of_jobs_L(location):
+    
+    response_api = requests.get(api_url)
+
+    number_of_jobs = 0
+
+    if response_api.ok:            
+        jobs = response_api.json()
+
+    for job in jobs:
+        loc = job.get('Location')
+
+        if loc.find(location) > -1 :
+            number_of_jobs = number_of_jobs + 1
+
+    number_of_jobs
+
+get_number_of_jobs_L("Los Angeles")
+
+locations = ['Los Angeles','New York','San Francisco','Washington DC','Seattle','Austin','Detroit']
+
+!pip install openpyxl
+from openpyxl import Workbook
+
+wb1 = Workbook()
+ws1 = wb1.active
+
+for location in locations:
+    result = get_number_of_jobs_L(location)
+    if result is not None:
+        ws1.append(result)
+
+wb1.save('job-postings (Collected from API).xlsx')
+wb1.close()
+
+wb2 = Workbook()
+ws2 = wb2.active
+
+languages = ['C','C#','C++','Java','JavaScript','Python','Scala','Oracle','SQL Server','MySQL Server','PostgreSQL','MongoDB']
+
+ws2.append(['Languages','Number of Jobs'])
+
+for i in range(len(languages)):
+    ws2.append(get_number_of_jobs_T(languages[i]))
+
+wb2.save('2.a-job-postings-languages (Collected from API).xlsx')
+wb2.close()
